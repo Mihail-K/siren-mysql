@@ -84,6 +84,14 @@ public:
         return _connection;
     }
 
+    // Local destroy shadows.
+    alias destroy = Adapter.destroy;
+
+    override ulong destroy(EscapedString query, string context)
+    {
+        return exec(query, context);
+    }
+
     override void disconnect()
     {
         close;
@@ -92,6 +100,22 @@ public:
     override EscapedString escape(string raw)
     {
         return raw.escapeMySQL;
+    }
+
+    // Local exec shadows.
+    alias exec = Adapter.exec;
+
+    override ulong exec(EscapedString query, string context)
+    {
+        ulong affected = 0;
+        auto command = Command(_connection, query.value);
+
+        if(command.execSQL(affected))
+        {
+            command.purgeResult;
+        }
+
+        return affected;
     }
 
     @property
