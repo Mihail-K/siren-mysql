@@ -1,6 +1,7 @@
 
 module siren.mysql.database.adapter;
 
+import siren.mysql.database.escape;
 import siren.mysql.database.savepoint;
 
 import siren.database;
@@ -89,7 +90,7 @@ public:
 
     override EscapedString escape(string raw)
     {
-        return raw.assumeEscaped; // TODO
+        return raw.escapeMySQL;
     }
 
     @property
