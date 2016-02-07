@@ -1,0 +1,6 @@
+name "siren-mysql"
+description "A minimal D application."
+copyright "Copyright © 2016, Mihail K"
+authors "Mihail-K"
+dependency "siren" path="../siren"
+targetType "library"
