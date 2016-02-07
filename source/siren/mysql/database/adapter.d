@@ -1,6 +1,7 @@
 
 module siren.mysql.database.adapter;
 
+import siren.mysql.database.bind;
 import siren.mysql.database.escape;
 import siren.mysql.database.savepoint;
 
@@ -26,7 +27,7 @@ private:
 public:
     override EscapedString bind(EscapedString sql, Nullable!Variant[] parameters...)
     {
-        return sql; // TODO
+        return sql.bindMySQL(parameters);
     }
 
     override void close()
