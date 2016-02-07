@@ -5,6 +5,7 @@ import siren.mysql.database.bind;
 import siren.mysql.database.escape;
 import siren.mysql.database.savepoint;
 
+import siren.config;
 import siren.database;
 import siren.sirl;
 import siren.util;
@@ -13,6 +14,7 @@ import mysql;
 
 import std.container.slist;
 import std.conv;
+import std.exception;
 import std.typecons;
 import std.variant;
 
@@ -68,7 +70,17 @@ public:
     {
         if(!connected)
         {
-            _connection = new Connection("TODO");
+            string host     = Config["mysql::host"];
+            string username = Config["mysql::username"];
+            string password = Config["mysql::password"];
+            string database = Config["mysql::db"];
+
+            enforce(host,     "Missing config property mysql::host");
+            enforce(username, "Missing config property mysql::username");
+            enforce(password, "Missing config property mysql::password");
+            enforce(database, "Missing config property mysql::db");
+
+            _connection = new Connection(host, username, password, database);
         }
     }
 
