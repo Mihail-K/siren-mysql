@@ -2,6 +2,7 @@
 module siren.mysql.database.adapter;
 
 import siren.mysql.database.insert_result;
+import siren.mysql.database.query_result;
 import siren.mysql.database.savepoint;
 import siren.mysql.sirl.node_visitor;
 import siren.mysql.util.bind;
@@ -98,6 +99,11 @@ public:
         return _connection;
     }
 
+    protected Command construct(EscapedString query)
+    {
+        return Command(_connection, query.value);
+    }
+
     // Local destroy shadows.
     alias destroy = Adapter.destroy;
 
@@ -130,7 +136,7 @@ public:
     override ulong exec(EscapedString query, string context)
     {
         ulong affected = 0;
-        auto command = Command(_connection, query.value);
+        auto command = construct(query);
 
         if(command.execSQL(affected))
         {
@@ -152,7 +158,7 @@ public:
     override InsertResult insert(EscapedString query, string context)
     {
         ulong affected = 0;
-        auto command = Command(_connection, query.value);
+        auto command = construct(query);
 
         if(command.execSQL(affected))
         {
@@ -209,6 +215,11 @@ public:
     // Local select shadows.
     alias select = Adapter.select;
 
+    override QueryResult select(EscapedString query, string context)
+    {
+        return new MySQLQueryResult(construct(query).execSQLResult);
+    }
+
     override QueryResult select(SelectBuilder sirl, string context = null)
     {
         auto visitor = new MySQLNodeVisitor;
@@ -238,6 +249,11 @@ public:
 
     // Local update shadows.
     alias update = Adapter.update;
+
+    override ulong update(EscapedString query, string context)
+    {
+        return exec(query, context);
+    }
 
     override ulong update(UpdateBuilder sirl, string context = null)
     {
