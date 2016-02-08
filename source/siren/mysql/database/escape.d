@@ -24,3 +24,28 @@ if(isSomeString!String)
 
     return raw.translate(table).assumeEscaped;
 }
+
+@property
+string quoteName(String)(String name)
+if(isSomeString!String)
+{
+    if(name.length)
+    {
+        if(name == "*")
+        {
+            return name;
+        }
+        else if(name[0] == '`' && name[$ - 1] == '`')
+        {
+            return name;
+        }
+        else
+        {
+            return '`' ~ name ~ '`';
+        }
+    }
+    else
+    {
+        return name;
+    }
+}

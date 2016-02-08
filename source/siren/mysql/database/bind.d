@@ -5,6 +5,7 @@ import siren.mysql.database.escape;
 
 import siren.util;
 
+import std.conv;
 import std.regex;
 import std.typecons;
 import std.variant;
@@ -14,26 +15,77 @@ EscapedString bindMySQL(EscapedString sql, Nullable!Variant[] parameters...)
     size_t index = 0;
     enum pattern = ctRegex!(r"\:\?");
 
-    return sql.value.replaceAll!((c) {
-        Nullable!Variant n = parameters[index++];
-        if(n.isNull) return "NULL";
+    return sql.value
+        .replaceAll!((c) => parameters[index++].expandParameter)(pattern)
+        .assumeEscaped;
+}
 
-        Variant v = n.get;
-        if(v.convertsTo!EscapedString)
+@property
+string expandParameter(Nullable!Variant parameter)
+{
+    if(parameter.isNull)
+    {
+        return "NULL";
+    }
+    else
+    {
+        Variant value = parameter.get;
+
+        if(value.convertsTo!EscapedString)
         {
-            return v.get!EscapedString.value;
+            return "'" ~ value.get!EscapedString.value ~ "'";
         }
-        else if(v.convertsTo!string)
+        else if(value.convertsTo!string)
         {
-            return v.get!string.escapeMySQL.value;
+            return "'" ~ value.get!string.escapeMySQL.value ~ "'";
         }
-        else if(v.convertsTo!bool)
+        else if(value.convertsTo!bool)
         {
-            return v.get!bool ? "true" : "false";
+            return value.get!bool ? "true" : "false";
+        }
+        else if(value.convertsTo!ulong)
+        {
+            return value.get!ulong.text;
+        }
+        else if(value.convertsTo!long)
+        {
+            return value.get!long.text;
+        }
+        else if(value.convertsTo!uint)
+        {
+            return value.get!uint.text;
+        }
+        else if(value.convertsTo!int)
+        {
+            return value.get!int.text;
+        }
+        else if(value.convertsTo!ushort)
+        {
+            return value.get!ushort.text;
+        }
+        else if(value.convertsTo!short)
+        {
+            return value.get!short.text;
+        }
+        else if(value.convertsTo!ubyte)
+        {
+            return value.get!ubyte.text;
+        }
+        else if(value.convertsTo!byte)
+        {
+            return value.get!byte.text;
+        }
+        else if(value.convertsTo!float)
+        {
+            return value.get!float.text;
+        }
+        else if(value.convertsTo!double)
+        {
+            return value.get!double.text;
         }
         else
         {
-            return v.coerce!string.escapeMySQL.value;
+            return "'" ~ value.coerce!string.escapeMySQL.value ~ "'";
         }
-    })(pattern).assumeEscaped;
+    }
 }
