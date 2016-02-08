@@ -40,6 +40,8 @@ public:
         if(connected)
         {
             _connection.close;
+            _connection = null;
+
             _savepoints.clear;
             _savecount = 0;
         }
