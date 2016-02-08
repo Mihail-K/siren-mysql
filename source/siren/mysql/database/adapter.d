@@ -287,3 +287,24 @@ public:
         return update(visitor.data.assumeEscaped, context);
     }
 }
+
+/+ - Adapter Registration - +/
+
+private
+{
+    shared static AdapterProvider.Token _token = null;
+
+    shared static this()
+    {
+        _token = AdapterProvider.register!(MySQLAdapter)("siren::mysql");
+    }
+
+    shared static ~this()
+    {
+        if(_token !is null)
+        {
+            scope(exit) _token = null;
+            AdapterProvider.unregister(_token);
+        }
+    }
+}
