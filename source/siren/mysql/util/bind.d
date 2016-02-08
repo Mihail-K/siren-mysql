@@ -1,7 +1,7 @@
 
-module siren.mysql.database.bind;
+module siren.mysql.util.bind;
 
-import siren.mysql.database.escape;
+import siren.mysql.util.escape;
 
 import siren.util;
 

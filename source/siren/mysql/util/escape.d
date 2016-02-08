@@ -1,5 +1,5 @@
 
-module siren.mysql.database.escape;
+module siren.mysql.util.escape;
 
 import siren.util;
 

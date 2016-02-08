@@ -1,8 +1,8 @@
 
 module siren.mysql.sirl.node_visitor;
 
-import siren.mysql.database.bind;
-import siren.mysql.database.escape;
+import siren.mysql.util.bind;
+import siren.mysql.util.escape;
 
 import siren.sirl;
 

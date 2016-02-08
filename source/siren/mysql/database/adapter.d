@@ -1,9 +1,9 @@
 
 module siren.mysql.database.adapter;
 
-import siren.mysql.database.bind;
-import siren.mysql.database.escape;
 import siren.mysql.database.savepoint;
+import siren.mysql.util.bind;
+import siren.mysql.util.escape;
 
 import siren.config;
 import siren.database;
