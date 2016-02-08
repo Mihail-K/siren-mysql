@@ -62,6 +62,11 @@ public:
                 auto query = "RELEASE SAVEPOINT " ~ savepoint.name ~ ";";
                 exec(query.assumeEscaped);
             }
+
+            foreach(hook; savepoint.hooks)
+            {
+                hook(true);
+            }
         }
         else
         {
@@ -146,6 +151,18 @@ public:
         return affected;
     }
 
+    override void hook(void delegate(bool) hook)
+    {
+        if(inTransaction)
+        {
+            _savepoints.front.add(hook);
+        }
+        else
+        {
+            assert(0); // TODO
+        }
+    }
+
     @property
     override bool inTransaction()
     {
@@ -204,6 +221,11 @@ public:
             {
                 auto query = "ROLLBACK TO " ~ savepoint.name ~ ";";
                 exec(query.assumeEscaped);
+            }
+
+            foreach(hook; savepoint.hooks)
+            {
+                hook(false);
             }
         }
         else
