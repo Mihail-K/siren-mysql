@@ -2,6 +2,7 @@
 module siren.mysql.database.adapter;
 
 import siren.mysql.database.savepoint;
+import siren.mysql.sirl.node_visitor;
 import siren.mysql.util.bind;
 import siren.mysql.util.escape;
 
@@ -104,6 +105,14 @@ public:
         return exec(query, context);
     }
 
+    override ulong destroy(DeleteBuilder sirl, string context = null)
+    {
+        auto visitor = new MySQLNodeVisitor;
+        visitor.visit(sirl.node);
+
+        return destroy(visitor.data.assumeEscaped, context);
+    }
+
     override void disconnect()
     {
         close;
@@ -134,6 +143,17 @@ public:
     override bool inTransaction()
     {
         return !_savepoints.empty;
+    }
+
+    // Local insert shadows.
+    alias insert = Adapter.insert;
+
+    override InsertResult insert(InsertBuilder sirl, string context = null)
+    {
+        auto visitor = new MySQLNodeVisitor;
+        visitor.visit(sirl.node);
+
+        return insert(visitor.data.assumeEscaped, context);
     }
 
     @property
@@ -172,6 +192,17 @@ public:
         }
     }
 
+    // Local select shadows.
+    alias select = Adapter.select;
+
+    override QueryResult select(SelectBuilder sirl, string context = null)
+    {
+        auto visitor = new MySQLNodeVisitor;
+        visitor.visit(sirl.node);
+
+        return select(visitor.data.assumeEscaped, context);
+    }
+
     override void transaction()
     {
         if(inTransaction)
@@ -189,5 +220,16 @@ public:
             auto query = "START TRANSACTION;".assumeEscaped;
             exec(query.assumeEscaped);
         }
+    }
+
+    // Local update shadows.
+    alias update = Adapter.update;
+
+    override ulong update(UpdateBuilder sirl, string context = null)
+    {
+        auto visitor = new MySQLNodeVisitor;
+        visitor.visit(sirl.node);
+
+        return update(visitor.data.assumeEscaped, context);
     }
 }
