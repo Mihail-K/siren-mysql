@@ -1,6 +1,7 @@
 
 module siren.mysql.database.adapter;
 
+import siren.mysql.database.insert_result;
 import siren.mysql.database.savepoint;
 import siren.mysql.sirl.node_visitor;
 import siren.mysql.util.bind;
@@ -147,6 +148,19 @@ public:
 
     // Local insert shadows.
     alias insert = Adapter.insert;
+
+    override InsertResult insert(EscapedString query, string context)
+    {
+        ulong affected = 0;
+        auto command = Command(_connection, query.value);
+
+        if(command.execSQL(affected))
+        {
+            command.purgeResult;
+        }
+
+        return new MySQLInsertResult(affected, command);
+    }
 
     override InsertResult insert(InsertBuilder sirl, string context = null)
     {
