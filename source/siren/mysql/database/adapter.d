@@ -15,7 +15,7 @@ import siren.util;
 
 import mysql;
 
-import std.container.slist;
+import std.container;
 import std.conv;
 import std.exception;
 import std.typecons;
@@ -30,6 +30,11 @@ private:
     SList!SavePoint _savepoints;
 
 public:
+    this()
+    {
+        _savepoints = make!(SList!SavePoint);
+    }
+
     override EscapedString bind(EscapedString sql, Nullable!Variant[] parameters...)
     {
         return sql.bindMySQL(parameters);
