@@ -11,6 +11,7 @@ import std.variant;
 class MySQLQueryRow : QueryRow
 {
 private:
+    string[] _columns = null;
     const size_t[string] _indexes;
     Row _row;
 
@@ -24,7 +25,17 @@ public:
     @property
     override string[] columns()
     {
-        return _indexes.keys;
+        if(_columns is null)
+        {
+            _columns = new string[_indexes.length];
+
+            foreach(column, index; _indexes)
+            {
+                _columns[index] = column;
+            }
+        }
+
+        return _columns;
     }
 
     @property
@@ -57,7 +68,7 @@ public:
     {
         auto values = new Nullable!Variant[columns.length];
 
-        foreach(index; 0 .. _indexes.length)
+        foreach(index; _indexes.values)
         {
             values[index] = this[index];
         }
