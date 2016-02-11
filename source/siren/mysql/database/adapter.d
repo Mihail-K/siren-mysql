@@ -85,9 +85,16 @@ public:
             string password = Config["mysql::password"];
             string database = Config["mysql::db"];
 
-            enforce(host,     "Missing config property mysql::host");
-            enforce(username, "Missing config property mysql::username");
-            enforce(password, "Missing config property mysql::password");
+            // Default database host to localhost.
+            host = host is null ? "localhost" : host;
+
+            // Default username to 'root'.
+            username = username is null ? "root" : username;
+
+            // Default password to be blank.
+            password = password is null ? "" : password;
+
+            // Database property is mandatory.
             enforce(database, "Missing config property mysql::db");
 
             _connection = new Connection(host, username, password, database);
