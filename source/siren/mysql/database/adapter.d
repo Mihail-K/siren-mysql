@@ -10,6 +10,7 @@ import siren.mysql.util.escape;
 
 import siren.config;
 import siren.database;
+import siren.logger;
 import siren.sirl;
 import siren.util;
 
@@ -128,6 +129,8 @@ public:
 
     override ulong destroy(EscapedString query, string context)
     {
+        context = context ? "Destroy " ~ context : "Destroy";
+
         return exec(query, context);
     }
 
@@ -162,6 +165,9 @@ public:
             command.purgeResult;
         }
 
+        context = context ? context : "Exec";
+        Logger.info(context, " : ", command.sql);
+
         return affected;
     }
 
@@ -195,6 +201,9 @@ public:
         {
             command.purgeResult;
         }
+
+        context = context ? "Create " ~ context : "Create";
+        Logger.info(context, " : ", command.sql);
 
         return new MySQLInsertResult(affected, command);
     }
@@ -253,7 +262,13 @@ public:
 
     override QueryResult select(EscapedString query, string context)
     {
-        return new MySQLQueryResult(construct(query).execSQLResult);
+        auto command = construct(query);
+        auto result = new MySQLQueryResult(command.execSQLResult);
+
+        context = context ? "Load " ~ context : "Load";
+        Logger.info(context, " : ", command.sql);
+
+        return result;
     }
 
     override QueryResult select(SelectBuilder sirl, string context = null)
@@ -288,6 +303,8 @@ public:
 
     override ulong update(EscapedString query, string context)
     {
+        context = context ? "Update " ~ context : context;
+
         return exec(query, context);
     }
 
