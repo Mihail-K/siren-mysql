@@ -21,7 +21,7 @@ public:
     @property
     override string[] columns()
     {
-        return _result.colNameIndicies.keys;
+        return cast(string[]) _result.colNames;
     }
 
     @property
